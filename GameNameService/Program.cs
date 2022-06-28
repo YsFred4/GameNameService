@@ -38,7 +38,7 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 
-app.MapGet("/generate", (string count) =>
+app.MapGet("/generate", (string? count) =>
 {
     NameData nameData = new NameData();
     //nameData.GameNames = new List<string>();
@@ -63,6 +63,44 @@ app.MapGet("/generate", (string count) =>
     return retData;
 });
 
+app.MapGet("/generatewithlocation", (string? count) =>
+{
+    NameData nameData = new NameData();
+    //nameData.GameNames = new List<string>();
+
+    // seed the random number generator
+    int seed = DateTime.Now.Ticks.GetHashCode();
+    Random random = new Random(seed);
+
+    // variable for the number of names to generate through a query string
+    int numberOfNames = 1;
+    int.TryParse(count, out numberOfNames);
+
+    // make sure at least 1 name is always generated
+    if (numberOfNames <= 0)
+    {
+        numberOfNames = 1;
+    }
+
+    List<GameWithLocation> games = new List<GameWithLocation>();
+
+    // call the method to generate game names
+    nameData.GenerateGameName(numberOfNames, random, string.Empty, string.Empty, string.Empty);
+    foreach (var item in nameData.GameNames)
+    {
+
+        games.Add(new GameWithLocation
+        {
+            name = item,
+            studio = nameData.GenerateStudio(random),
+            latitude = (float)(random.NextDouble() * 180.0 - 90.0),
+            longitude = (float)(random.NextDouble() * 360.0 - 180.0)
+        });
+    }
+    var retData = new { names = games };
+    return retData;
+});
+
 
 app.Run();
 
@@ -73,6 +111,14 @@ internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary
 
 
 
+
+public class GameWithLocation
+{
+    public string name { get; set; }
+    public string studio { get; set; }
+    public float longitude { get; set; }
+    public float latitude { get; set; }
+}
 
 
 public class NameData

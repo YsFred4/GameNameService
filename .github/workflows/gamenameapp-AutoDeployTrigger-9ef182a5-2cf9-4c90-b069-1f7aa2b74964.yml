@@ -36,7 +36,7 @@ jobs:
         with:
           push: true
           tags: talkregistry.azurecr.io/gamenameapp:${{ github.sha }}
-          file: ./Dockerfile
+          file: ./GameNameService/Dockerfile
           context: ./
 
 

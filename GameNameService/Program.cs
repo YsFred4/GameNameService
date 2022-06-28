@@ -22,7 +22,62 @@ var summaries = new[]
 };
 
 
-var FirstArray = new List<string> {
+
+
+app.MapGet("/weatherforecast", () =>
+{
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast
+        (
+            DateTime.Now.AddDays(index),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
+    return forecast;
+})
+.WithName("GetWeatherForecast");
+
+app.MapGet("/generate", (string count) =>
+{
+    NameData nameData = new NameData();
+    //nameData.GameNames = new List<string>();
+
+    // seed the random number generator
+    int seed = DateTime.Now.Ticks.GetHashCode();
+    Random random = new Random(seed);
+
+    // variable for the number of names to generate through a query string
+    int numberOfNames = 1;
+    int.TryParse(count, out numberOfNames);
+
+    // make sure at least 1 name is always generated
+    if (numberOfNames <= 0)
+    {
+        numberOfNames = 1;
+    }
+
+    // call the method to generate game names
+    nameData.GenerateGameName(numberOfNames, random, string.Empty, string.Empty, string.Empty);
+    var retData = new { names = nameData.GameNames };
+    return retData;
+});
+
+
+app.Run();
+
+internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+
+
+
+
+
+public class NameData
+{
+    List<string> FirstArray = new List<string> {
            "3D",
            "8-Bit",
            "A Boy and His",
@@ -543,7 +598,7 @@ var FirstArray = new List<string> {
            "Zombie^Zombies"
         };
 
-var SecondArray = new List<string>() {
+    List<string> SecondArray = new List<string>() {
            "3D",
            "Acid",
            "Aerobics",
@@ -895,7 +950,7 @@ var SecondArray = new List<string>() {
            "Zombie^Zombies"
         };
 
-var ThirdArray = new List<string>() {
+    List<string> ThirdArray = new List<string>() {
            "- 2nd Impact",
            "- 3rd Strike",
            "1942",
@@ -1305,7 +1360,7 @@ var ThirdArray = new List<string>() {
            "Zone"
         };
 
-var StudioSecondArray = new List<string> {
+    List<string> StudioSecondArray = new List<string> {
            "Games",
            "Studio",
            "Inc",
@@ -1316,61 +1371,6 @@ var StudioSecondArray = new List<string> {
         };
 
 
-
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.MapGet("/generate", (string count) =>
-{
-    NameData nameData = new NameData();
-    //nameData.GameNames = new List<string>();
-
-    // seed the random number generator
-    int seed = DateTime.Now.Ticks.GetHashCode();
-    Random random = new Random(seed);
-
-    // variable for the number of names to generate through a query string
-    int numberOfNames = 1;
-    int.TryParse(count, out numberOfNames);
-
-    // make sure at least 1 name is always generated
-    if (numberOfNames <= 0)
-    {
-        numberOfNames = 1;
-    }
-
-    // call the method to generate game names
-    nameData.GenerateGameName(numberOfNames, random, string.Empty, string.Empty, string.Empty);
-    var retData = new { names = nameData.GameNames };
-    return retData;
-});
-
-
-app.Run();
-
-internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-
-
-
-
-
-public class NameData
-{
     // parts of game name
     public string First { get; set; }
     public string Second { get; set; }
